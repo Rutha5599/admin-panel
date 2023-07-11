@@ -1,0 +1,32 @@
+<%=updatedata%>
+
+    <%if(messages.success){%>
+
+        <div class="alert alert-success" style="width: fit-content;">
+            <%=messages.success%>
+        </div>
+
+        <%}%>
+            <center>
+                <form method="post" action="/update/<%=updatedata.id%>" enctype="multipart/form-data">
+                    <table>
+                        UPDATE
+                        <tr>
+                            <div style="width: 100%; display: flex; flex-wrap: wrap;">
+                                <div style="width: 97%; margin-left: 10px; margin-top: 10px;">
+                                    USERNAME:-
+                                    <input type="text" name="username" value="<%=updatedata.username%>">
+                                </div>
+                                <div style="width: 97%; margin-left: 10px; margin-top: 10px;">
+                                    EMAIL ID:-
+                                    <input type="text" name="email" value="<%=updatedata.email%>">
+                                </div>
+                                <div style="width: 98%; margin-left: 10px; margin-top: 10px;">
+                                    img:-
+                                    <input type="file" name="img">
+                                    
+                                  </div>
+                        </tr>
+                        <input type="submit" value="Submit">
+                    </form>
+            </center>
