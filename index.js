@@ -1,18 +1,18 @@
 const express = require('express');
 const path = require('path');
 // const flash=require('express-flash');
-const session=require('express-session');
+// const session=require('express-session');
 const port =8000;
 const app=express();
 
 
 // app.use(flash());
 
-app.use(session({
-    secret:'mysecret',
-    saveUninitialized:false,
-    resave:false
-}))
+// app.use(session({
+//     secret:'mysecret',
+//     saveUninitialized:false,
+//     resave:false
+// }))
 
 require('./config/db')
 const bodyparser=require('body-parser');
