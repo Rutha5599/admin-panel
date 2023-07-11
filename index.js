@@ -1,12 +1,12 @@
 const express = require('express');
 const path = require('path');
-// const flash=require('express-flash');
+const flash=require('express-flash');
 const session=require('express-session');
 const port =8000;
 const app=express();
 
 
-// app.use(flash());
+app.use(flash());
 
 app.use(session({
     secret:'mysecret',
