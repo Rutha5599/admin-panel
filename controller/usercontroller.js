@@ -1,6 +1,8 @@
 const express = require('express');
 const user = require('../model/usermodel');
 const cloudinary = require('../cloud/cloudinary');
+const jwt = require('jsonwebtoken');
+
 
 //register page
 
@@ -17,7 +19,7 @@ module.exports.register = (req, res) => {
 
 //register post data
 
-module.exports.registerdata = async(req,res) =>{
+module.exports.registerdata = async (req, res) => {
     try {
         console.log(req.body);
         var username = req.body.username
@@ -32,7 +34,7 @@ module.exports.registerdata = async(req,res) =>{
                 password
             });
             req.flash('success', 'Register Successfully')
-            res.redirect('/login');
+            res.redirect('back');
         } else {
             req.flash('success', 'Email Alread Exist')
             res.redirect('back');
@@ -65,13 +67,19 @@ exports.logindata = async (req, res) => {
     var data = await user.findOne({ email });
     if (data == null) {
         console.log("please register or enter valid email");
-        req.flash('success', 'Please Register Valid Email')
+        req.flash('success', 'Please Register Valid Email');
         res.redirect('back')
 
     }
     else {
         if (data.password == password) {
-            req.flash('success', 'Loging Successfully')
+            req.flash('success', 'Loging Successfully');
+
+            console.log(data);
+            var token = await jwt.sign({ userid: data._id }, process.env.key);
+            res.cookie("jwt", token, { expires: new Date(Date.now() + 24 * 60 * 60 * 1000) })
+            console.log(token);
+
             res.redirect('/dashboard');
             console.log("login successfully");
         }
@@ -88,7 +96,7 @@ exports.logindata = async (req, res) => {
 
 // forgetpassword page
 
-module.exports.forgotpassword = async(req, res) => {
+module.exports.forgotpassword = async (req, res) => {
 
     try {
         res.render('forgot-password');
@@ -100,7 +108,7 @@ module.exports.forgotpassword = async(req, res) => {
 
 //dashboard page
 
-module.exports.dashboard = async(req, res) => {
+module.exports.dashboard = async (req, res) => {
 
     try {
         res.render('dashboard');
@@ -112,7 +120,7 @@ module.exports.dashboard = async(req, res) => {
 
 //forms page
 
-module.exports.forms= async(req, res) => {
+module.exports.forms = async (req, res) => {
 
     try {
         res.render('forms-input');
@@ -124,11 +132,11 @@ module.exports.forms= async(req, res) => {
 
 //user table page
 
-module.exports.table= async(req, res) => {
+module.exports.table = async (req, res) => {
 
     try {
-        var data=await user.find({})
-        res.render('tables-basic',{data});
+        var data = await user.find({})
+        res.render('tables-basic', { data });
     } catch (error) {
         console.log(err);
     }
@@ -137,13 +145,13 @@ module.exports.table= async(req, res) => {
 
 // user table data deletes
 
-module.exports.deletes= async(req,res)=>{
+module.exports.deletes = async (req, res) => {
 
     try {
         console.log(req.params)
         var cd = await user.findByIdAndDelete(req.params.id);
         console.log(data);
-    
+
         if (cd) {
             console.log('data deleted successfully')
             req.flash('success', 'Data Deleted Successfully')
@@ -153,7 +161,7 @@ module.exports.deletes= async(req,res)=>{
             console.log('data not deleted')
         }
     } catch (error) {
-        
+
     }
 
 }
@@ -165,7 +173,7 @@ module.exports.updatepage = async (req, res) => {
 
 
     console.log(req.params);
-    var updatedata = await user.findById(req.params.id );
+    var updatedata = await user.findById(req.params.id);
     res.render('user-table-data', { updatedata });
 
 }
@@ -174,42 +182,42 @@ module.exports.updatepage = async (req, res) => {
 
 
 
-module.exports.updates= async(req,res)=>{
+module.exports.updates = async (req, res) => {
 
-    console.log(req.params,req.url)
+    console.log(req.params, req.url)
     console.log(req.body)
-    var data=await user.findById(req.params.id);
-    if(req.file){
+    var data = await user.findById(req.params.id);
+    if (req.file) {
 
-        cloudinary.uploader.destroy(data.img_id,(err,result)=>{
-            if(err){
-            console.log(err);
+        cloudinary.uploader.destroy(data.img_id, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log(result);
+            }
+        })
+
+
+        console.log(req.file);
+        if (req.file) {
+
+            var data = await cloudinary.uploader.upload(req.file.path, { folder: 'sos' })
+            var img = data.secure_url
+            var img_id = data.public_id
         }
-        else{
-            console.log(result);
+        req.body.img = img
+        req.body.img_id = img_id
+
+        var update = await user.findByIdAndUpdate(req.params.id, req.body);
+        if (update) {
+            console.log("data updated successfully");
+            req.flash('success', 'Data update Successfully')
+            res.redirect('/table');
         }
-    })
-    
-
-    console.log(req.file);
-        if(req.file){
-
-            var data=await cloudinary.uploader.upload(req.file.path,{folder:'sos'})
-            var img=data.secure_url
-            var img_id=data.public_id
+        else {
+            req.flash('success', 'Data not update')
+            console.log('data not updated')
         }
-        req.body.img=img
-        req.body.img_id=img_id
-
-    var update = await user.findByIdAndUpdate(req.params.id, req.body);
-    if (update) {
-        console.log("data updated successfully");
-        req.flash('success', 'Data update Successfully')
-        res.redirect('/table');
     }
-    else {
-        req.flash('success', 'Data not update')
-        console.log('data not updated')
-    }
-}
 }
