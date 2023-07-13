@@ -19,7 +19,7 @@ const user_token = async(req,res,next)=>{
         }
     }
     else{
-        res.redirect('/register')
+        res.redirect('/login')
     }
 
 }
