@@ -16,6 +16,12 @@ routes.get('/delete/:id',user_token,controller.deletes);
 routes.get('/update/:id',user_token,controller.updatepage);
 routes.post('/update/:id',user_token,upload.single('img'),controller.updates);
 routes.get('/forms',user_token,controller.forms);
+routes.get('/logout',(req,res)=>{
+
+    res.cookie("jwt",'');
+    res.clearCookie();
+    res.redirect('/dashboard');
+})
 
 
 
