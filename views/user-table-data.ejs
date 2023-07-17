@@ -1,14 +1,14 @@
-<%=updatedata%>
 
-    <%if(messages.success){%>
 
-        <div class="alert alert-success" style="width: fit-content;">
-            <%=messages.success%>
-        </div>
-
-        <%}%>
-            <center>
-                <form method="post" action="/update/<%=updatedata.id%>" enctype="multipart/form-data">
+<center>
+                <%if(messages.success){%>
+            
+                    <div class="alert alert-success" style="width: fit-content;">
+                        <%=messages.success%>
+                    </div>
+            
+                    <%}%>
+                <form method="post" action="/admin/update/<%=updatedata.id%>" enctype="multipart/form-data">
                     <table>
                         UPDATE
                         <tr>
@@ -19,7 +19,8 @@
                                 </div>
                                 <div style="width: 97%; margin-left: 10px; margin-top: 10px;">
                                     EMAIL ID:-
-                                    <input type="text" name="email" value="<%=updatedata.email%>">
+                                    <input type="text" name="" value="" id="ee"><br>
+                                    OLD EMAIL ID:-<label for=""><%=updatedata.email%></label>
                                 </div>
                                 <div style="width: 98%; margin-left: 10px; margin-top: 10px;">
                                     img:-
@@ -27,6 +28,22 @@
                                     
                                   </div>
                         </tr>
-                        <input type="submit" value="Submit">
+                        <input type="submit" value="Submit" onclick="hh()">
                     </form>
             </center>
+
+
+<script>
+
+    function hh(){
+        var dd = document.getElementById('ee').value
+
+        if(dd==""){
+            document.getElementById('ee').name=""
+            
+        }else{
+            document.getElementById('ee').name="email"
+            
+        }
+    }
+</script>

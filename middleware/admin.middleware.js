@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const user_token = async(req,res,next)=>{
+const admin = require('../model/adminmodel')
+const admin_token = async(req,res,next)=>{
     var toten = req.cookies.jwt
     if(toten){
         console.log("token success");
@@ -11,11 +12,18 @@ const user_token = async(req,res,next)=>{
 
         })
         if(userdata == undefined){
-                res.redirect('/deshboard')
+                res.redirect('/admin/login')
 
         }
         else{
-            next()
+            var data = await admin.findById(userdata.userid)
+            if(data == null){
+                res.redirect('/admin/login');
+                console.log(data,userdata);
+            }
+            else{
+                next();
+            }
         }
     }
     else{
@@ -27,4 +35,4 @@ const user_token = async(req,res,next)=>{
 
 
 
-module.exports=user_token;
+module.exports=admin_token;

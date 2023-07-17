@@ -1,5 +1,5 @@
 const express = require('express');
-const user = require('../model/usermodel');
+const admin = require('../model/adminmodel');
 const cloudinary = require('../cloud/cloudinary');
 const jwt = require('jsonwebtoken');
 
@@ -26,7 +26,7 @@ module.exports.registerdata = async (req, res) => {
         var email = req.body.email
         var password = req.body.password
 
-        var finds = await user.findOne({ email });
+        var finds = await admin.findOne({ email });
         if (finds == null) {
             var userdata = await user.create({
                 username,
@@ -64,7 +64,7 @@ exports.logindata = async (req, res) => {
 
     var email = req.body.email
     var password = req.body.password
-    var data = await user.findOne({ email });
+    var data = await admin.findOne({ email });
     if (data == null) {
         console.log("please register or enter valid email");
         req.flash('success', 'Please Register Valid Email');
@@ -80,7 +80,7 @@ exports.logindata = async (req, res) => {
             res.cookie("jwt", token, { expires: new Date(Date.now() + 24 * 60 * 60 * 1000) })
             console.log(token);
 
-            res.redirect('/dashboard');
+            res.redirect('/admin/dashboard');
             console.log("login successfully");
         }
         else {
@@ -135,7 +135,7 @@ module.exports.forms = async (req, res) => {
 module.exports.table = async (req, res) => {
 
     try {
-        var data = await user.find({})
+        var data = await admin.find({})
         res.render('tables-basic', { data });
     } catch (error) {
         console.log(err);
@@ -149,9 +149,7 @@ module.exports.deletes = async (req, res) => {
 
     try {
         console.log(req.params)
-        var cd = await user.findByIdAndDelete(req.params.id);
-        console.log(data);
-
+        var cd = await admin.findByIdAndDelete(req.params.id);
         if (cd) {
             console.log('data deleted successfully')
             req.flash('success', 'Data Deleted Successfully')
@@ -161,7 +159,7 @@ module.exports.deletes = async (req, res) => {
             console.log('data not deleted')
         }
     } catch (error) {
-
+        console.log(error);
     }
 
 }
@@ -173,7 +171,7 @@ module.exports.updatepage = async (req, res) => {
 
 
     console.log(req.params);
-    var updatedata = await user.findById(req.params.id);
+    var updatedata = await admin.findById(req.params.id);
     res.render('user-table-data', { updatedata });
 
 }
@@ -186,7 +184,7 @@ module.exports.updates = async (req, res) => {
 
     console.log(req.params, req.url)
     console.log(req.body)
-    var data = await user.findById(req.params.id);
+    var data = await admin.findById(req.params.id);
     if (req.file) {
 
         cloudinary.uploader.destroy(data.img_id, (err, result) => {
@@ -198,7 +196,7 @@ module.exports.updates = async (req, res) => {
             }
         })
 
-
+    }
         console.log(req.file);
         if (req.file) {
 
@@ -208,16 +206,30 @@ module.exports.updates = async (req, res) => {
         }
         req.body.img = img
         req.body.img_id = img_id
+        var email = req.body.email
+        var find = await admin.find({ email });
 
-        var update = await user.findByIdAndUpdate(req.params.id, req.body);
-        if (update) {
-            console.log("data updated successfully");
-            req.flash('success', 'Data update Successfully')
-            res.redirect('/table');
+        console.log(find.length);
+
+        if (find.length == 0) {
+
+            var update = await admin.findByIdAndUpdate(req.params.id, req.body);
+            if (update) {
+                console.log("data updated successfully");
+                req.flash('success', 'Data update Successfully')
+                res.redirect('/admin/table');
+            }
+            else {
+                req.flash('success', 'Data not update');
+                console.log('data not updated');
+                res.redirect('back');
+            }
         }
         else {
-            req.flash('success', 'Data not update')
-            console.log('data not updated')
+            console.log('updated email already exits');
+            req.flash('success', 'updated email already exits');
+            res.redirect('back')
         }
     }
-}
+    
+

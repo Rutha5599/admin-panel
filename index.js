@@ -48,12 +48,18 @@ app.use(express.urlencoded({extended: false}));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname,'views'));
 app.use(express.static(path.join(__dirname,'assets')))
+app.use(express.static(path.join(__dirname,'public')))
 
 
-app.use('/',require('./routes/user'));
+app.use('/admin',require('./routes/adminrouter'));
+app.use('/user',require('./routes/userrouter'));
+
+app.get('/admin',(req,res)=>{
+    res.redirect('/admin/login')
+});
 
 app.get('/',(req,res)=>{
-    res.render('login');
+    res.redirect('/user')
 })
 
 app.use((req,res)=>{
